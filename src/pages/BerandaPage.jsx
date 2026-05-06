@@ -1,9 +1,23 @@
+import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Leaf, Award, ScanLine, Recycle } from 'lucide-react';
 import useAppStore from '../store/useAppStore';
 
 export default function BerandaPage() {
-  const stats = useAppStore((state) => state.getStats());
+  const scans = useAppStore((state) => state.scans);
+  const points = useAppStore((state) => state.points);
+  
+  const stats = useMemo(() => {
+    const totalScans = scans.length;
+    const co2Saved = (totalScans * 0.5).toFixed(1);
+    const recycledItems = scans.filter(s => s.label !== 'trash').length;
+    return {
+      totalPoints: points,
+      totalScans,
+      co2Saved,
+      recycledItems
+    };
+  }, [scans, points]);
 
   return (
     <div className="p-4 space-y-6">

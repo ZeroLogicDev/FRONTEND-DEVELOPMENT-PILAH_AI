@@ -1,12 +1,12 @@
 import { useState, useRef, useCallback } from 'react';
-import { Camera, Image as ImageIcon, RotateCcw, Check, Loader2 } from 'lucide-react';
+import { Camera, Image as ImageIcon, RotateCcw, Check, Loader2, Leaf, Award, ScanLine } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
 import axios from 'axios';
 import useAppStore from '../store/useAppStore';
 
-const API_URL = 'http://localhost:5000'; // Sesuaikan jika deploy di production
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Sesuaikan jika deploy di production
 
 export default function ScanPage() {
   const [stream, setStream] = useState(null);
