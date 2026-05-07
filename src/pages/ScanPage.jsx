@@ -28,6 +28,8 @@ export default function ScanPage() {
       // Double protection: ikat stream secara langsung saat elemen sudah di DOM
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        videoRef.current.muted = true;
+        videoRef.current.setAttribute('playsinline', 'true');
         videoRef.current.play().catch(e => console.error("Direct play error:", e));
       }
     } catch (err) {
@@ -49,6 +51,8 @@ export default function ScanPage() {
   useEffect(() => {
     if (stream && videoRef.current && videoRef.current.srcObject !== stream) {
       videoRef.current.srcObject = stream;
+      videoRef.current.muted = true;
+      videoRef.current.setAttribute('playsinline', 'true');
       videoRef.current.play().catch(e => console.error("Effect play error:", e));
     }
   }, [stream]);
@@ -60,15 +64,32 @@ export default function ScanPage() {
 
   const capturePhoto = () => {
     if (videoRef.current) {
-      if (!videoRef.current.videoWidth || !videoRef.current.videoHeight) {
+      let width = videoRef.current.videoWidth;
+      let height = videoRef.current.videoHeight;
+      
+      if (!width || !height) {
         toast.error('Kamera sedang memuat', { description: 'Mohon tunggu beberapa detik hingga gambar muncul.' });
         return;
       }
+
+      // Batasi ukuran maksimal untuk menghindari crash canvas atau memory limit di browser mobile
+      const MAX_DIMENSION = 1280;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
       const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
+      canvas.width = width;
+      canvas.height = height;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      
+      // Pastikan background hitam jika frame gagal render
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(videoRef.current, 0, 0, width, height);
+      
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       setCapturedImage(dataUrl);
       stopCamera();
@@ -151,7 +172,11 @@ export default function ScanPage() {
                   autoPlay 
                   playsInline 
                   muted
-                  onLoadedMetadata={(e) => e.target.play().catch(console.error)}
+                  defaultMuted
+                  onLoadedMetadata={(e) => {
+                    e.target.muted = true;
+                    e.target.play().catch(console.error);
+                  }}
                   className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${stream ? 'opacity-100' : 'opacity-0'}`}
                 />
                 
