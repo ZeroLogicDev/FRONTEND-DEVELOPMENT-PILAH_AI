@@ -17,8 +17,14 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* Gradient & Blur Overlay di sisi kiri */}
-        <div className="absolute inset-y-0 left-0 z-10 w-full lg:w-3/5 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-transparent backdrop-blur-[4px] lg:backdrop-blur-sm pointer-events-none"></div>
+        {/* Gradient & Blur Overlay di sisi kiri (Diperhalus dengan mask-image) */}
+        <div 
+          className="absolute inset-y-0 left-0 z-10 w-full lg:w-3/4 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-900/0 backdrop-blur-md pointer-events-none"
+          style={{
+            maskImage: 'linear-gradient(to right, black 30%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to right, black 30%, transparent 100%)'
+          }}
+        ></div>
 
         {/* Content */}
         <div className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 pt-20">
