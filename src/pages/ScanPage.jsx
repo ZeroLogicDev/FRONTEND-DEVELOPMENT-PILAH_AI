@@ -135,18 +135,19 @@ export default function ScanPage() {
           <Card className="overflow-hidden flex-1 flex flex-col border-none shadow-md bg-slate-50 h-[55vh] md:h-[65vh]">
             {!capturedImage ? (
               <div className="relative flex-1 bg-black rounded-t-xl overflow-hidden flex flex-col items-center justify-center">
-                {stream ? (
-                  <video 
-                    ref={videoRef} 
-                    autoPlay 
-                    playsInline 
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-center p-6 flex flex-col items-center">
-                    <Camera size={48} className="text-slate-500 mb-4" />
-                    <p className="text-slate-400 text-sm mb-4">Kamera belum aktif</p>
-                    <Button onClick={startCamera} variant="secondary">
+                {/* Selalu render video agar videoRef selalu menempel ke DOM tanpa delay */}
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline 
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${stream ? 'opacity-100' : 'opacity-0'}`}
+                />
+                
+                {!stream && (
+                  <div className="text-center p-6 flex flex-col items-center relative z-10 bg-black/40 w-full h-full justify-center backdrop-blur-sm">
+                    <Camera size={48} className="text-slate-300 mb-4" />
+                    <p className="text-slate-300 text-sm mb-4 font-medium">Kamera belum aktif</p>
+                    <Button onClick={startCamera} variant="secondary" className="shadow-lg">
                       Aktifkan Kamera
                     </Button>
                   </div>
