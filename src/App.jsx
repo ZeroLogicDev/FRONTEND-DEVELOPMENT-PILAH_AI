@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import LandingPage from './pages/LandingPage';
@@ -9,6 +10,7 @@ import AuthPage from './pages/AuthPage';
 import ProfilePage from './pages/ProfilePage';
 import { Toaster } from './components/ui/sonner';
 import useAppStore from './store/useAppStore';
+import { supabase } from './lib/supabase';
 
 function ProtectedRoute({ children }) {
   const session = useAppStore(state => state.session);
@@ -19,6 +21,26 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
+  const setUser = useAppStore(state => state.setUser);
+
+  useEffect(() => {
+    // Periksa sesi saat pertama dimuat
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) setUser(session.user, session);
+    });
+
+    // Dengarkan perubahan status login (sangat penting untuk OAuth Google)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setUser(session.user, session);
+      } else {
+        setUser(null, null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setUser]);
+
   return (
     <BrowserRouter>
       <Routes>
