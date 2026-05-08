@@ -8,7 +8,14 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const user = useAppStore(state => state.user);
   const logout = useAppStore(state => state.logout);
-  const stats = useAppStore(state => state.getStats());
+  const getStats = useAppStore(state => state.getStats);
+  
+  // Subscribe to state changes so ProfilePage re-renders when they change
+  useAppStore(state => state.scans);
+  useAppStore(state => state.points);
+  useAppStore(state => state.redemptions);
+  
+  const stats = getStats();
 
   const handleLogout = async () => {
     await logout();
